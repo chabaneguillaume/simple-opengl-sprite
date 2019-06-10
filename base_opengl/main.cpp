@@ -22,12 +22,14 @@ GLFWwindow* window;
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
 
-#include "shader.hpp"
-#include "texture.hpp"
-
+// Inlude DEVIL
 #include <IL/il.h>
 #include <IL/ilu.h>
 #include <IL/ilut.h>
+
+// My include
+#include "shader.hpp"
+#include "texture.hpp"
 
 int main( void )
 {
@@ -41,17 +43,21 @@ int main( void )
     glfwWindowHint(GLFW_SAMPLES, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     
+    // disable double buffer
+    //glfwWindowHint( GLFW_DOUBLEBUFFER, GL_FALSE );
+    
     // Open a window and create its OpenGL context
-    window = glfwCreateWindow( 1024, 768, "Tutorial 05 - Textured Cube", NULL, NULL);
+    window = glfwCreateWindow( 640, 480, "Simple sprite", NULL, NULL);
     if( window == NULL ){
-        fprintf( stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
+        fprintf( stderr, "Failed to open GLFW window\n" );
         glfwTerminate();
         return -1;
     }
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
     
     // Initialize GLEW
     glewExperimental = true; // Needed for core profile
@@ -69,62 +75,77 @@ int main( void )
     iluInit();
     ilutInit();
     
-    // Dark blue background
+    // Set the clear color
     glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
     
-    // Enable depth test
-    glEnable(GL_DEPTH_TEST);
-    // Accept fragment if it closer to the camera than the former one
-    glDepthFunc(GL_LESS);
+    // Enbale Blend
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
     
+    // VAO
     GLuint VertexArrayID;
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
     
-    // Create and compile our GLSL program from the shaders
+    // Shader program
     GLuint programID = LoadShaders( "TransformVertexShader.vertexshader", "TextureFragmentShader.fragmentshader" );
-    
-    // Get a handle for our "MVP" uniform
+    // MPV uniform
     GLuint MatrixID = glGetUniformLocation(programID, "MVP");
-    vec3 position(0,0,0);
-    glm::mat4 Projection = ortho(0.0f,640.0f,0.0f,480.0f,-10.0f,10.0f);
-    // Camera matrix
-    vec3 direction(0,0,-1);
-    glm::mat4 View = lookAt(position,position + direction,vec3(0,1,0));
-    // Model matrix : an identity matrix (model will be at the origin)
-    glm::mat4 Model = glm::mat4(1.0f);
-    // Our ModelViewProjection : multiplication of our 3 matrices
-    glm::mat4 MVP = Projection * View * Model; // Remember, matrix multiplication is the other way around
-    
-    // Load the texture using any two methods
-    //GLuint Texture = loadBMP_custom("uvtemplate.bmp");
-    GLuint Texture = loadImage("sprite.png");
-    //GLuint Texture = loadDDS("sprite.dds");
-    // Get a handle for our "myTextureSampler" uniform
+    // TextureSampler uniform
     GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
     
-    // Our vertices. Tree consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
-    // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
-    static const GLfloat g_vertex_buffer_data[] = {
-        0.0f,0.0f,0.0f,
-        16.0f,0.0f, 0.0f,
-        16.0f, 16.0f, 0.0f,
-        16.0f, 16.0f,0.0f,
-        0.0f,16.0f,0.0f,
-        0.0f, 0.0f,0.0f
+    // View setup
+    vec3 position(0,0,0);
+    glm::mat4 Projection = ortho(0.0f,640.0f,0.0f,480.0f,-10.0f,10.0f);
+    glViewport(0, 0, 640, 480);
+    vec3 direction(0,0,-1);
+    glm::mat4 View = lookAt(position,position + direction,vec3(0,1,0));
+    glm::mat4 Model = glm::mat4(1.0f);
+    glm::mat4 MVP = Projection * View * Model;
+
+    // Load a texture
+    GLuint Texture = loadImage("spritesheet.png");
+    
+
+    // Set vertices
+    static const GLint g_vertex_buffer_data[] = {
+        0, 0,
+        16, 0,
+        16, 16,
+        16, 16,
+        0, 16,
+        0, 0
+        ,
+        16, 0,
+        32, 0,
+        32, 16,
+        32, 16,
+        16, 16,
+        16, 0
+        
+        
+        
     };
     
-    
-    // Two UV coordinatesfor each vertex. They were created with Blender.
+    // Set UVs
     static const GLfloat g_uv_buffer_data[] = {
         0.0f,0.0f,
-        1.0f,0.0f,
-        1.0f,1.0f,
-        1.0f,1.0f,
-        0.0f,1.0f,
+        0.5f,0.0f,
+        0.5f,0.5f,
+        0.5f,0.5f,
+        0.0f,0.5f,
         0.0f,0.0f
+        ,
+        0.0f,0.0f,
+        0.5f,0.0f,
+        0.5f,0.5f,
+        0.5f,0.5f,
+        0.0f,0.5f,
+        0.0f,0.0f
+        
     };
     
+    // Create and generate buffers
     GLuint vertexbuffer;
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -133,12 +154,14 @@ int main( void )
     GLuint uvbuffer;
     glGenBuffers(1, &uvbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data),  &g_uv_buffer_data[0], GL_STATIC_DRAW);
     
+    
+    
+    // Update loop
     do{
         
-        
-        
+        // Move the view
         if (glfwGetKey( window, GLFW_KEY_RIGHT ) == GLFW_PRESS){
             position.x -= 1;
         }
@@ -150,30 +173,31 @@ int main( void )
         if (glfwGetKey( window, GLFW_KEY_UP ) == GLFW_PRESS){
             position.y -= 1;
         }
-       
+        
         if (glfwGetKey( window, GLFW_KEY_DOWN ) == GLFW_PRESS){
             position.y += 1;
         }
         
         View = lookAt(position,position + direction,vec3(0,1,0));
-        //View = glm::scale(View, vec3(4,4,4));
+        //View = glm::scale(View, vec3(2,2,2));
+        
+        // Update MVP uniform
         MVP = Projection * View * Model;
-        
-        
+
+        // Draw
         // Clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        // Use our shader
+        // Set shader program to use
         glUseProgram(programID);
         
-        // Send our transformation to the currently bound shader,
-        // in the "MVP" uniform
+        // Send updated MVP uniform
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
         
-        // Bind our texture in Texture Unit 0
+        // Bind texture
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, Texture);
-        // Set our "myTextureSampler" sampler to use Texture Unit 0
+        // Set sampler to use Texture Unit 0
         glUniform1i(TextureID, 0);
         
         // 1rst attribute buffer : vertices
@@ -181,8 +205,8 @@ int main( void )
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
         glVertexAttribPointer(
                               0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
-                              3,                  // size
-                              GL_FLOAT,           // type
+                              2,                  // size
+                              GL_INT,           // type
                               GL_FALSE,           // normalized?
                               0,                  // stride
                               (void*)0            // array buffer offset
@@ -200,15 +224,20 @@ int main( void )
                               (void*)0                          // array buffer offset
                               );
         
-        // Draw the triangle !
-        glDrawArrays(GL_TRIANGLES, 0, 2*3);
+        
+        glDrawArrays(GL_TRIANGLES, 0, 4*3);
         
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
         
-        // Swap buffers
+        // need Swap buffers if double buffer
         glfwSwapBuffers(window);
+        
+        // need to glFlush() if single buffer
+        //glFlush();
+        
         glfwPollEvents();
+        
         
     } // Check if the ESC key was pressed or the window was closed
     while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
@@ -226,3 +255,5 @@ int main( void )
     
     return 0;
 }
+
+

@@ -20,6 +20,7 @@
 		F06B2A5722A2887000076069 /* TransformVertexShader.vertexshader in Resources */ = {isa = PBXBuildFile; fileRef = F06B2A5522A2887000076069 /* TransformVertexShader.vertexshader */; };
 		F06B2A5922A288AE00076069 /* sprite.png in Resources */ = {isa = PBXBuildFile; fileRef = F06B2A5822A288AE00076069 /* sprite.png */; };
 		F07CE34522A3F00500329585 /* texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F07CE34322A3F00500329585 /* texture.cpp */; };
+		F087B7E322AE9D0000759F49 /* spritesheet.png in Resources */ = {isa = PBXBuildFile; fileRef = F087B7E222AE9D0000759F49 /* spritesheet.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 		F06B2A5822A288AE00076069 /* sprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sprite.png; sourceTree = "<group>"; };
 		F07CE34322A3F00500329585 /* texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = texture.cpp; sourceTree = "<group>"; };
 		F07CE34422A3F00500329585 /* texture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = texture.hpp; sourceTree = "<group>"; };
+		F087B7E222AE9D0000759F49 /* spritesheet.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spritesheet.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +91,7 @@
 				F06B2A5422A2887000076069 /* TextureFragmentShader.fragmentshader */,
 				F06B2A5522A2887000076069 /* TransformVertexShader.vertexshader */,
 				F06B2A5822A288AE00076069 /* sprite.png */,
+				F087B7E222AE9D0000759F49 /* spritesheet.png */,
 			);
 			path = base_opengl;
 			sourceTree = "<group>";
@@ -167,6 +170,7 @@
 				F06B2A2D22A2854100076069 /* Assets.xcassets in Resources */,
 				F06B2A5622A2887000076069 /* TextureFragmentShader.fragmentshader in Resources */,
 				F06B2A5722A2887000076069 /* TransformVertexShader.vertexshader in Resources */,
+				F087B7E322AE9D0000759F49 /* spritesheet.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
